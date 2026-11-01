@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEUP! — Experimental Noise Archive</title>
+    <style>
+        :root {
+            --bg-color: #080808;
+            --text-color: #d1d1d1;
+            --accent-color: #ff3333;
+            --muted-color: #666666;
+            --border-color: #222222;
+            --card-bg: #111111;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Canvas Background for Noise Waves */
+        #noise-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(8, 8, 8, 0.9);
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        nav a {
+            color: var(--muted-color);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 5%;
+        }
+
+        section {
+            margin-bottom: 6rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        .hero {
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--muted-color);
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: var(--bg-color);
+        }
+
+        .btn-accent {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--muted-color);
+        }
+
+        .card h3 {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card .meta {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--muted-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Timeline Archive */
+        .timeline-item {
+            border-left: 1px solid var(--border-color);
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 5px;
+            width: 7px;
+            height: 7px;
+            background: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-title {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--muted-color);
+        }
+
+        /* Gear specs */
+        .gear-list {
+            list-style: none;
+        }
+
+        .gear-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .gear-list li span:last-child {
+            color: var(--muted-color);
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 5%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--muted-color);
+        }
+
+        footer a {
+            color: var(--text-color);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="noise-canvas"></canvas>
+
+    <header>
+        <a href="#" class="logo">HEU<span>P!</span></a>
+        <nav>
+            <a href="#releases">Releases</a>
+            <a href="#live">Live Archive</a>
+            <a href="#rigs">Rig Lab</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>HEUP!</h1>
+            <p>Solo experimental noise project originating from Bandung, based in Baltimore. Sculpting raw walls of sound, analog feedback textures, and tactile pedal manipulation.</p>
+            <a href="https://heup.bandcamp.com" target="_blank" class="btn btn-accent">Bandcamp Archive</a>
+            <a href="#contact" class="btn">Direct Inquiries</a>
+        </section>
+
+        <section id="releases">
+            <h2>Discography & Releases</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Chromatography (Collaboration)</h3>
+                    <span class="meta">Vinyl / Digital — 2026</span>
+                    <p>Collaborative release exploring dense structural noise layers and spatial analog resonance.</p>
+                    <a href="https://heup.bandcamp.com" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; margin:0;">Listen / Buy</a>
+                </div>
+                <div class="card">
+                    <h3>Extended Sound Sculptures</h3>
+                    <span class="meta">Limited Vinyl (50 Copies) — 2026</span>
+                    <p>Archival documentation of custom extended-duration experimental compositions.</p>
+                    <a href="https://heup.bandcamp.com" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; margin:0;">Listen / Buy</a>
+                </div>
+                <div class="card">
+                    <h3>Bandung to Baltimore (Lo-Fi Sessions)</h3>
+                    <span class="meta">Cassette / Digital</span>
+                    <p>Foundational cassette works capturing early tape-loop manipulations and guitar circuit self-oscillation.</p>
+                    <a href="https://heup.bandcamp.com" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; margin:0;">Listen / Buy</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="live">
+            <h2>Live Performance Archive</h2>
+            
+            <div class="timeline-item">
+                <div class="timeline-date">AUGUST 5, 2026</div>
+                <div class="timeline-title">Le Mondo — Baltimore, MD</div>
+                <div class="timeline-desc">Collaborative avant-garde live set focusing on real-time feedback loops and textural guitar soundscapes.</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date">AUGUST 1, 2026</div>
+                <div class="timeline-title">Bruit Fest XI — Lancaster County Park, PA</div>
+                <div class="timeline-desc">Open-air experimental noise performance utilizing dual analog pedal chains and extended string preparation.</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date">JUNE 2026</div>
+                <div class="timeline-title">Collaboration Framework w/ MAYOGASH</div>
+                <div class="timeline-desc">Targeted live improvisation framework focusing on drone dissonance and rhythm-less structural tension.</div>
+            </div>
+        </section>
+
+        <section id="rigs">
+            <h2>Tactile Rig & Equipment Lab</h2>
+            <p style="color: var(--muted-color); margin-bottom: 1.5rem; font-size: 0.9rem;">Core analog hardware configuration utilized for sound generation and live manipulation:</p>
+            <ul class="gear-list">
+                <li><span>Primary Guitars</span><span>Modified Fender Jaguar (CIJ S019591) + Custom Shims</span></li>
+                <div></div>
+                <li><span>Looper System</span><span>Electro-Harmonix 2880 Super Multi-Track Looper (FAT16 CF Cards)</span></li>
+                <li><span>Modulation Hub</span><span>Electro-Harmonix Flanger Hoax</span></li>
+                <li><span>Noise Texture</span><span>Behringer Feedback Pedals & Analog Delay Array</span></li>
+                <li><span>Field Recording</span><span>Tascam Portable Recorders for Environmental Noise Sources</span></li>
+            </ul>
+        </section>
+
+        <section id="contact">
+            <h2>Direct Contact & Booking</h2>
+            <p style="color: var(--muted-color); margin-bottom: 1.5rem; font-size: 0.9rem;">For physical physical release orders, physical distribution networks, gig bookings, or collaboration inquiries:</p>
+            <a href="mailto:heup.exp@outlook.com" class="btn btn-accent">heup.exp@outlook.com</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 HEUP! Experimental Noise Archive. All Rights Reserved. Hosted via <a href="https://github.com" target="_blank">GitHub Pages</a>.</p>
+    </footer>
+
+    <script>
+        // Subtle background generative noise waves animation
+        const canvas = document.getElementById('noise-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let step = 0;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#222222';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < canvas.height; i += 40) {
+                ctx.beginPath();
+                for (let x = 0; x < canvas.width; x += 20) {
+                    let y = i + Math.sin(x * 0.005 + step + i) * 15;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+            step += 0.01;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
